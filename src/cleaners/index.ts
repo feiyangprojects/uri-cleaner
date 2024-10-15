@@ -1,3 +1,9 @@
+import { cleaner as b23tvCleaner, pattern as b23tvPattern } from "./b23tv.ts";
+import {
+    parameters as bilibiliParameters,
+    pattern as bilibiliPattern,
+} from "./bilibili.ts";
+
 type config = {
     common: string[];
     sites: (
@@ -22,7 +28,14 @@ const config: config = {
         "utm_term",
         "utm_content",
     ],
-    sites: [],
+    sites: [
+        {
+            pattern: b23tvPattern,
+            cleaner: b23tvCleaner,
+            parameters: bilibiliParameters,
+        },
+        { pattern: bilibiliPattern, parameters: bilibiliParameters },
+    ],
 };
 
 export default async function index(url: URL): Promise<URL> {
