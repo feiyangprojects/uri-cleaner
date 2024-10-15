@@ -5,6 +5,12 @@ import clean from "./cleaners/index.ts";
 import * as consts from "./utils/consts.ts";
 import * as utils from "./utils/index.ts";
 
+async function handleCommand(ctx: Context) {
+    await ctx.reply(
+        "Hi, I can clean links from unnecessary search parameters and redirects, send me a link via this chat or inline query to start.",
+    );
+}
+
 async function handleInline(
     ctx: NarrowedContext<Context<Update>, Update.InlineQueryUpdate>,
 ) {
@@ -76,6 +82,7 @@ async function handleMessage(
 if (consts.BOT_TOKEN != undefined) {
     const bot = new Telegraf(consts.BOT_TOKEN);
 
+    bot.command("start", handleCommand);
     bot.on("inline_query", handleInline);
     bot.on("text", handleMessage);
 
