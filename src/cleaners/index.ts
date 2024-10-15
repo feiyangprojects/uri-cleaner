@@ -11,6 +11,14 @@ import {
     parameters as xiaohongshuParameters,
     pattern as xiaohongshuPattern,
 } from "./xiaohongshu.ts";
+import {
+    parameters as youtubeParameters,
+    pattern as youtubePattern,
+} from "./youtube.ts";
+import {
+    cleaner as youtudotbeCleaner,
+    pattern as youtudotbePattern,
+} from "./youtudotbe.ts";
 
 type config = {
     common: string[];
@@ -49,6 +57,12 @@ const config: config = {
             parameters: xiaohongshuParameters,
         },
         { pattern: xiaohongshuPattern, parameters: xiaohongshuParameters },
+        { pattern: youtubePattern, parameters: youtubeParameters },
+        {
+            pattern: youtudotbePattern,
+            cleaner: youtudotbeCleaner,
+            parameters: youtubeParameters,
+        },
     ],
 };
 
