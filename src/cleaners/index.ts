@@ -3,6 +3,14 @@ import {
     parameters as bilibiliParameters,
     pattern as bilibiliPattern,
 } from "./bilibili.ts";
+import {
+    cleaner as xhslinkcomCleaner,
+    pattern as xhslinkcomPattern,
+} from "./xhslinkcom.ts";
+import {
+    parameters as xiaohongshuParameters,
+    pattern as xiaohongshuPattern,
+} from "./xiaohongshu.ts";
 
 type config = {
     common: string[];
@@ -35,6 +43,12 @@ const config: config = {
             parameters: bilibiliParameters,
         },
         { pattern: bilibiliPattern, parameters: bilibiliParameters },
+        {
+            pattern: xhslinkcomPattern,
+            cleaner: xhslinkcomCleaner,
+            parameters: xiaohongshuParameters,
+        },
+        { pattern: xiaohongshuPattern, parameters: xiaohongshuParameters },
     ],
 };
 
