@@ -7,6 +7,7 @@ import {
     parameters as commonParameters,
     secureCleaner as commonSecureCleaner,
 } from "./common.ts";
+import { pattern as tcoPattern } from "./tco.ts";
 import {
     parameters as twitterParameters,
     pattern as twitterPattern,
@@ -45,6 +46,7 @@ const sites: sites = [
         parameters: bilibiliParameters,
     },
     { pattern: bilibiliPattern, parameters: bilibiliParameters },
+    { pattern: tcoPattern, cleaner: commonSecureCleaner },
     { pattern: twitterPattern, parameters: twitterParameters },
     {
         pattern: xhslinkcomPattern,

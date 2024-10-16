@@ -1,0 +1,1 @@
+export const pattern = new URLPattern("http{s}?://t.co/*")
