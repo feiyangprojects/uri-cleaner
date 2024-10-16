@@ -1,16 +1,17 @@
-import { cleaner as b23tvCleaner, pattern as b23tvPattern } from "./b23tv.ts";
+import { pattern as b23tvPattern } from "./b23tv.ts";
 import {
     parameters as bilibiliParameters,
     pattern as bilibiliPattern,
 } from "./bilibili.ts";
 import {
+    parameters as commonParameters,
+    secureCleaner as commonSecureCleaner,
+} from "./common.ts";
+import {
     parameters as twitterParameters,
     pattern as twitterPattern,
 } from "./twitter.ts";
-import {
-    cleaner as xhslinkcomCleaner,
-    pattern as xhslinkcomPattern,
-} from "./xhslinkcom.ts";
+import { pattern as xhslinkcomPattern } from "./xhslinkcom.ts";
 import {
     parameters as xiaohongshuParameters,
     pattern as xiaohongshuPattern,
@@ -24,57 +25,45 @@ import {
     pattern as youtudotbePattern,
 } from "./youtudotbe.ts";
 
-type config = {
-    common: string[];
-    sites: (
-        & {
-            pattern: URLPattern;
-            cleaner?: (url: URL) => Promise<URL>;
-            parameters?: string[];
-        }
-        & ({
-            cleaner: (url: URL) => Promise<URL>;
-        } | {
-            parameters: string[];
-        })
-    )[];
-};
+type sites = (
+    & {
+        pattern: URLPattern;
+        cleaner?: (url: URL) => Promise<URL>;
+        parameters?: string[];
+    }
+    & ({
+        cleaner: (url: URL) => Promise<URL>;
+    } | {
+        parameters: string[];
+    })
+)[];
 
-const config: config = {
-    common: [
-        "utm_source",
-        "utm_medium",
-        "utm_campaign",
-        "utm_term",
-        "utm_content",
-    ],
-    sites: [
-        {
-            pattern: b23tvPattern,
-            cleaner: b23tvCleaner,
-            parameters: bilibiliParameters,
-        },
-        { pattern: bilibiliPattern, parameters: bilibiliParameters },
-        { pattern: twitterPattern, parameters: twitterParameters },
-        {
-            pattern: xhslinkcomPattern,
-            cleaner: xhslinkcomCleaner,
-            parameters: xiaohongshuParameters,
-        },
-        { pattern: xiaohongshuPattern, parameters: xiaohongshuParameters },
-        { pattern: youtubePattern, parameters: youtubeParameters },
-        {
-            pattern: youtudotbePattern,
-            cleaner: youtudotbeCleaner,
-            parameters: youtubeParameters,
-        },
-    ],
-};
+const sites: sites = [
+    {
+        pattern: b23tvPattern,
+        cleaner: commonSecureCleaner,
+        parameters: bilibiliParameters,
+    },
+    { pattern: bilibiliPattern, parameters: bilibiliParameters },
+    { pattern: twitterPattern, parameters: twitterParameters },
+    {
+        pattern: xhslinkcomPattern,
+        cleaner: commonSecureCleaner,
+        parameters: xiaohongshuParameters,
+    },
+    { pattern: xiaohongshuPattern, parameters: xiaohongshuParameters },
+    { pattern: youtubePattern, parameters: youtubeParameters },
+    {
+        pattern: youtudotbePattern,
+        cleaner: youtudotbeCleaner,
+        parameters: youtubeParameters,
+    },
+];
 
 export default async function index(url: URL): Promise<URL> {
     let newUrl = url;
 
-    for (const site of config.sites) {
+    for (const site of sites) {
         if (site.pattern.test(newUrl)) {
             if (site.cleaner !== undefined) {
                 newUrl = await site.cleaner(newUrl);
@@ -87,7 +76,7 @@ export default async function index(url: URL): Promise<URL> {
         }
     }
 
-    config.common.forEach((parameter) => {
+    commonParameters.forEach((parameter) => {
         newUrl.searchParams.delete(parameter);
     });
 
