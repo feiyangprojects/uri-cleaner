@@ -1,3 +1,5 @@
 {
-  "importMap": "import_map.json"
+  "imports": {
+    "telegraf": "npm:telegraf@^4.16.3"
+  }
 }
