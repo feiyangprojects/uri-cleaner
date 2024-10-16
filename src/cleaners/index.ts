@@ -4,6 +4,10 @@ import {
     pattern as bilibiliPattern,
 } from "./bilibili.ts";
 import {
+    parameters as twitterParameters,
+    pattern as twitterPattern,
+} from "./twitter.ts";
+import {
     cleaner as xhslinkcomCleaner,
     pattern as xhslinkcomPattern,
 } from "./xhslinkcom.ts";
@@ -51,6 +55,7 @@ const config: config = {
             parameters: bilibiliParameters,
         },
         { pattern: bilibiliPattern, parameters: bilibiliParameters },
+        { pattern: twitterPattern, parameters: twitterParameters },
         {
             pattern: xhslinkcomPattern,
             cleaner: xhslinkcomCleaner,
