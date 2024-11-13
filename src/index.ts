@@ -1,26 +1,64 @@
 import { Context, Telegraf } from "telegraf";
 import type { NarrowedContext } from "telegraf";
-import type { Message, Update } from "telegraf/types";
+import type { InlineQueryResult, Message, Update } from "telegraf/types";
 import clean from "./cleaners/index.ts";
 import * as consts from "./utils/consts.ts";
 import * as utils from "./utils/index.ts";
+export function createInlineQueryResult(
+    title: string,
+    description: string,
+    message_text: string,
+): InlineQueryResult[] {
+    return [{
+        type: "article",
+        id: utils.getRandomString(16),
+        title: title,
+        description: description,
+        input_message_content: {
+            message_text: message_text,
+        },
+    }];
+}
+
+export async function createInlineQueryResultDemo(): Promise<InlineQueryResult[]> {
+    const url = await clean(new URL(utils.getUrl(consts.MESSAGES.DEMO_DESCRIPTION)!))
+
+    return createInlineQueryResult(
+        consts.MESSAGES.DEMO_TITLE,
+        consts.MESSAGES.DEMO_DESCRIPTION,
+        url.toString(),
+    );
+}
+
+export function createInlineQueryResultFailed(): InlineQueryResult[] {
+    return createInlineQueryResult(
+        consts.MESSAGES.FAILED_TITLE,
+        consts.MESSAGES.FAILED_DESCRIPTION,
+        consts.MESSAGES.FAILED_DESCRIPTION,
+    );
+}
+
+export function createInlineQueryResultDone(
+    url: string,
+): InlineQueryResult[] {
+    return createInlineQueryResult(
+        consts.MESSAGES.DONE_TITLE,
+        consts.MESSAGES.DONE_DESCRIPTION,
+        url,
+    );
+}
 
 async function handleCommand(ctx: Context) {
-    await ctx.reply(
-        "Hi, I can clean links from unnecessary search parameters and redirects, send me a link via this chat or inline query to start.",
-    );
+    await ctx.reply(consts.MESSAGES.START);
 }
 
 async function handleInline(
     ctx: NarrowedContext<Context<Update>, Update.InlineQueryUpdate>,
 ) {
     if (ctx.inlineQuery.query !== "") {
-        const protocol = /^https?:\/\/.+/;
-        let query = "";
-        if (protocol.test(ctx.inlineQuery.query)) {
-            query = ctx.inlineQuery.query;
-        } else {
-            query = `https://${ctx.inlineQuery.query}`;
+        const query = utils.getUrl(ctx.inlineQuery.query)
+        if (query === null) {
+            return await ctx.answerInlineQuery(createInlineQueryResultFailed())
         }
 
         try {
@@ -28,27 +66,12 @@ async function handleInline(
 
             const newUrl = await clean(url);
 
-            await ctx.answerInlineQuery(utils.createInlineQueryResult(
-                "Link Processed",
-                "Tap here for the processed link.",
-                newUrl.toString(),
-            ));
+            await ctx.answerInlineQuery(createInlineQueryResultDone(newUrl.toString()));
         } catch (_) {
-            const description =
-                "Unable to process this input, please check input or try again later.";
-
-            await ctx.answerInlineQuery(utils.createInlineQueryResult(
-                "Error",
-                description,
-                description,
-            ));
+            await ctx.answerInlineQuery(createInlineQueryResultFailed())
         }
     } else {
-        await ctx.answerInlineQuery(utils.createInlineQueryResult(
-            "Input Link",
-            "Example: https://example.org/?utm_source=google",
-            "https://example.org/",
-        ));
+        await ctx.answerInlineQuery(await createInlineQueryResultDemo());
     }
 }
 
@@ -58,12 +81,9 @@ async function handleMessage(
         update_id: number;
     }>,
 ) {
-    const protocol = /^https?:\/\/.+/;
-    let text = "";
-    if (protocol.test(ctx.text)) {
-        text = ctx.text;
-    } else {
-        text = `https://${ctx.text}`;
+    const text = utils.getUrl(ctx.text)
+    if (text === null) {
+        return await ctx.reply(consts.MESSAGES.FAILED_DESCRIPTION)
     }
 
     try {
@@ -73,9 +93,7 @@ async function handleMessage(
 
         await ctx.reply(newUrl.toString());
     } catch (_) {
-        await ctx.reply(
-            "Unable to process this input, please check input or try again later.",
-        );
+        await ctx.reply(consts.MESSAGES.FAILED_DESCRIPTION);
     }
 }
 

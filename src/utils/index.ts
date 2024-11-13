@@ -1,5 +1,3 @@
-import type { InlineQueryResult } from "telegraf/types";
-
 export function getRandomString(length: number): string {
     const array = new Uint8Array(length);
     crypto.getRandomValues(array);
@@ -12,18 +10,14 @@ export function getRandomString(length: number): string {
     return string;
 }
 
-export function createInlineQueryResult(
-    title: string,
-    description: string,
-    message_text: string,
-): InlineQueryResult[] {
-    return [{
-        type: "article",
-        id: getRandomString(16),
-        title: title,
-        description: description,
-        input_message_content: {
-            message_text: message_text,
-        },
-    }];
+export function getUrl(url: string): string | null {
+    // https://www.rfc-editor.org/rfc/rfc2396#appendix-B
+    const matchedUrl = url.match(
+        /((?:http|https):)(\/\/([^/?#]*))([^?#]*)(\?([^#]*))?(#(.*))?/,
+    );
+    if (matchedUrl !== null) {
+        return matchedUrl[0];
+    } else {
+        return null;
+    }
 }
